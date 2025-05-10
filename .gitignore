@@ -2,5 +2,7 @@ output_patches/
 output_patches_noice/
 dataset/
 visualization_output/
+prompt.md
+signature_template.png
 .venv
 .DS_Store

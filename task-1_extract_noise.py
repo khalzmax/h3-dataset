@@ -9,8 +9,8 @@ import numpy as np
 # Constants
 SPRITES_DIR = '../datasets/heroes3_sprites/units'
 CSV_FILE = '../datasets/H3Units.csv'
-OUTPUT_DIR = './output_patches_noice'
-OUTPUT_CSV_FILE = f"{OUTPUT_DIR}/annotations_noice_extended.csv"
+OUTPUT_DIR = './output_patches_noise'
+OUTPUT_CSV_FILE = f"{OUTPUT_DIR}/annotations_noise_extended.csv"
 
 # Utility: Normalize name
 def camel_to_hyphen(name):
@@ -126,8 +126,8 @@ def crop_and_save(unit_row, signature_template=None):
             # 58x64px is most likely a unit avatar
             frame_type = 'unit_avatar'
         else:
-            # Other frames are considered as noice
-            frame_type = 'noice'
+            # Other frames are considered as noise
+            frame_type = 'noise'
         saved_paths.append({
             'Unit_name': unit_name,
             'Frame_ID': int(i),

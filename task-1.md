@@ -1,4 +1,4 @@
-# Dataset preparation
+# Task 1. Dataset preparation
 
 After running AI-generated object recognition without filtering frame sizes,
 the dataset has lots of small frames, with the max size 7x10 px. We need to filter out these objects from the dataset
@@ -105,7 +105,10 @@ annotations/
 
 A script to highlight bounding boxes from the csv on a random png sprite.
 
-### Make dataset
+# Task 2. Generate the dataset
 
   Generate a script to make a dataset in `./dataset` folder. Make sure that units with frame_type="unit_avatar" stays in training model. make 15% for testing and 15% for training sets. Pick the units randomly.
+
+
+# Task 3. Train neural network
 

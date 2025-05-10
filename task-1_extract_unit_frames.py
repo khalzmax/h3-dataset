@@ -13,8 +13,9 @@ OUTPUT_DIR = './output_patches'
 OUTPUT_CSV_FILE = f"{OUTPUT_DIR}/annotations_extended.csv"
 
 # Define sizes Frames to skip skip (e.g., unit avatars)
-unit_avatar_sizes = [(58, 64)]
-# unit_avatar_sizes = [(58, 64), (32, 32), (28, 32), (30, 32), (32, 31)]
+# Added both small and large avatar sizes with tolerance
+unit_avatar_sizes = [(58, 64), (30, 30)]  # Large and small avatar sizes
+avatar_size_tolerance = 5  # Allow ±3px deviation in size
 
 # Utility: Normalize name
 def camel_to_hyphen(name):
@@ -24,17 +25,38 @@ def camel_to_hyphen(name):
 def get_sprite_path(unit_name):
     return f"{SPRITES_DIR}/{camel_to_hyphen(unit_name)}.png"
 
+# Check if a size matches an avatar size with tolerance
+def is_avatar_size(w, h):
+    for avatar_w, avatar_h in unit_avatar_sizes:
+        if (abs(w - avatar_w) <= avatar_size_tolerance and 
+            abs(h - avatar_h) <= avatar_size_tolerance):
+            return True
+    return False
+
 def filter_by_histogram_similarity(image, boxes, threshold=0.5):
+    if not boxes:
+        return []
+        
     # Compute histograms for all patches
     histograms = []
     patches = []
     for (x, y, w, h) in boxes:
         patch = image[y:y+h, x:x+w]
+        # Ensure we use RGB channels for histogram comparison
+        if patch.shape[2] == 4:  # RGBA
+            patch_rgb = patch[:,:,:3]
+        else:
+            patch_rgb = patch
+            
         patches.append(patch)
-        hist = cv2.calcHist([patch], [0, 1, 2], None, [8, 8, 8],
+        hist = cv2.calcHist([patch_rgb], [0, 1, 2], None, [8, 8, 8],
                             [0, 256, 0, 256, 0, 256])
         hist = cv2.normalize(hist, hist).flatten()
         histograms.append(hist)
+    
+    if not histograms:
+        return []
+        
     histograms = np.array(histograms)
 
     # Compute the average histogram
@@ -45,9 +67,8 @@ def filter_by_histogram_similarity(image, boxes, threshold=0.5):
     for i, hist in enumerate(histograms):
         w, h = boxes[i][2], boxes[i][3]
         
-        # Skip frames matching the defined sizes Frames to skip
-        if any(w == sw and h == sh for sw, sh in unit_avatar_sizes):
-            # print(f"Keeping patch {i} with ratio: w:{w} h:{h}")
+        # Skip frames matching the defined avatar sizes with tolerance
+        if is_avatar_size(w, h):
             filtered_boxes.append(boxes[i])
             continue
         
@@ -72,6 +93,7 @@ def extract_valid_bounding_boxes(image, signature_template=None):
     all_boxes = []
     for cnt in contours:
         x, y, w, h = cv2.boundingRect(cnt)
+        # Filter out small boxes
         if w > 25 and h > 25:
             all_boxes.append((x, y, w, h))
 
@@ -97,23 +119,103 @@ def extract_valid_bounding_boxes(image, signature_template=None):
         return filtered_boxes
     return all_boxes
 
+def matches_small_avatar(w, h):
+    avatar_w, avatar_h = unit_avatar_sizes[1]  # Small avatar size (30x30)
+    return (abs(w - avatar_w) <= avatar_size_tolerance and 
+            abs(h - avatar_h) <= avatar_size_tolerance)
+
+def matches_large_avatar(w, h):
+    avatar_w, avatar_h = unit_avatar_sizes[0]  # Large avatar size (58x64)
+    return (w == avatar_w and h == avatar_h)
+
+def handle_avatar_matching(image, boxes):
+    """
+    Match small avatars with large avatars in the image.
+    
+    Args:
+        image: The source image containing avatars
+        boxes: List of bounding boxes (x, y, w, h)
+        
+    Returns:
+        small_matched: Set of indices of small avatars that match large ones
+        large_matched: Set of indices of large avatars that have matching small ones
+    """
+    # Separate small avatars and large avatars for matching
+    small_avatars = []
+    large_avatars = []
+    
+    for i, (x, y, w, h) in enumerate(boxes):
+        if matches_small_avatar(w, h):
+            small_avatars.append((i, x, y, w, h))
+        elif matches_large_avatar(w, h):
+            large_avatars.append((i, x, y, w, h))
+    
+    # Try to match small avatars with large ones
+    small_matched = set()  # Track which small avatars have a match
+    large_matched = set()  # Track which large avatars have a match
+    
+    # Match threshold
+    match_threshold = 0.9
+    
+    for small_idx, small_x, small_y, small_w, small_h in small_avatars:
+        small_patch = image[small_y:small_y+small_h, small_x:small_x+small_w]
+        # Use RGB channels for matching
+        if small_patch.shape[2] == 4:
+            small_patch_rgb = small_patch[:,:,:3]
+        else:
+            small_patch_rgb = small_patch
+        
+        best_match = None
+        best_match_val = 0
+        
+        for large_idx, large_x, large_y, large_w, large_h in large_avatars:
+            large_patch = image[large_y:large_y+large_h, large_x:large_x+large_w]
+            if large_patch.shape[2] == 4:
+                large_patch_rgb = large_patch[:,:,:3]
+            else:
+                large_patch_rgb = large_patch
+                
+            # Resize small avatar to same size as large for comparison
+            small_resized = cv2.resize(small_patch_rgb, (large_patch_rgb.shape[1], large_patch_rgb.shape[0]))
+            
+            try:
+                # Match small avatar in large avatar
+                result = cv2.matchTemplate(large_patch_rgb, small_resized, cv2.TM_CCOEFF_NORMED)
+                _, max_val, _, _ = cv2.minMaxLoc(result)
+                
+                if max_val > best_match_val:
+                    best_match_val = max_val
+                    best_match = large_idx
+            except:
+                continue
+        
+        # If good match found
+        if best_match_val > match_threshold:
+            small_matched.add(small_idx)
+            large_matched.add(best_match)
+    
+    return small_matched, large_matched
+
 # Crop and save image patches
 def crop_and_save(unit_row, signature_template=None):
-    # print(f"Processing unit: {unit_row['Unit_name']}")
     unit_name = unit_row['Unit_name']
     sprite_path = get_sprite_path(unit_name)
     if not os.path.exists(sprite_path):
         return []
 
-    image = cv2.imread(sprite_path, cv2.IMREAD_UNCHANGED)  # Load with alpha channel if available
+    image = cv2.imread(sprite_path, cv2.IMREAD_UNCHANGED)
     if image is None:
         print(f"Error: Unable to load image - {sprite_path}")
         return []
     
     # Extract bounding boxes and optionally remove the author sign
     boxes = extract_valid_bounding_boxes(image, signature_template=signature_template)
+    
     # Filter out patches by color histogram similarity
     boxes = filter_by_histogram_similarity(image, boxes, threshold=0.5)
+    
+    # Match small and large avatars
+    small_matched, large_matched = handle_avatar_matching(image, boxes)
     
     saved_paths = []
     for i, (x, y, w, h) in enumerate(boxes):
@@ -123,12 +225,21 @@ def crop_and_save(unit_row, signature_template=None):
         out_path = out_dir / f"{Path(sprite_path).stem}_frame_{i}.png"
         cv2.imwrite(str(out_path), patch)
         
-        if any(w == sw and h == sh for sw, sh in unit_avatar_sizes):
-            # 58x64px is most likely a unit avatar
-            frame_type = 'unit_avatar'
+        # Set frame_type based on size and matching results
+        if matches_large_avatar(w, h):
+            if i in large_matched:
+                frame_type = 'unit_avatar'  # Confirmed large avatar
+            else:
+                frame_type = 'unit_avatar'  # Still assign as avatar based on size
+        elif matches_small_avatar(w, h):
+            if i in small_matched:
+                frame_type = 'unit_avatar'  # Confirmed small avatar
+            else:
+                frame_type = 'unit_avatar'  # Small avatars also get the unit_avatar type
         else:
             # Other frames are considered unit frames
             frame_type = 'unit'
+            
         saved_paths.append({
             'Unit_name': unit_name,
             'Frame_ID': int(i),
