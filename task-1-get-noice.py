@@ -9,8 +9,8 @@ import numpy as np
 # Constants
 SPRITES_DIR = '../datasets/heroes3_sprites/units'
 CSV_FILE = '../datasets/H3Units.csv'
-OUTPUT_DIR = './output_patches'
-OUTPUT_CSV_FILE = f"{OUTPUT_DIR}/annotations_extended.csv"
+OUTPUT_DIR = './output_patches_noice'
+OUTPUT_CSV_FILE = f"{OUTPUT_DIR}/annotations_noice_extended.csv"
 
 # Utility: Normalize name
 def camel_to_hyphen(name):
@@ -39,17 +39,18 @@ def filter_by_histogram_similarity(image, boxes, threshold=0.5):
     # Filter out patches whose histogram is too different from the average
     filtered_boxes = []
     for i, hist in enumerate(histograms):
-        w, h = boxes[i][2], boxes[i][3]
-        # skip for frames [58x64px, 32x32px] as these are most likely be a unit avatar
+        # w, h = boxes[i][2], boxes[i][3]
+        # skip for frames 58x64px as it is most likely be a unit avatar
         # check the exact size +- 1 px
-        if (abs(58-w) <= 1 and abs(64-h) <= 1) or (w == 32 and h == 32):
-            # print(f"Keeping patch {i} with ratio: w:{w} h:{h}")
-            filtered_boxes.append(boxes[i])
-            continue
+        # if abs(58-w) <= 1 and abs(64-h) <= 1:
+        #     print(f"Keeping patch {i} with ratio: w:{w} h:{h}")
+        #     filtered_boxes.append(boxes[i])
+        #     continue
         
         # Use correlation or Bhattacharyya distance
         dist = cv2.compareHist(hist.astype('float32'), avg_hist.astype('float32'), cv2.HISTCMP_BHATTACHARYYA)
-        if dist < threshold:
+        # if dist < threshold:
+        if dist >= threshold:
             filtered_boxes.append(boxes[i])
         # else:
         #     print(f"Filtered out patch {i} with histogram distance: {dist:.4f}")
@@ -68,7 +69,9 @@ def extract_valid_bounding_boxes(image, signature_template=None):
     all_boxes = []
     for cnt in contours:
         x, y, w, h = cv2.boundingRect(cnt)
-        if w > 25 and h > 25:
+        # if w > 25 and h > 25:
+        # let's keep all sizes bigger than a letter
+        if w > 7 and h > 10:
             all_boxes.append((x, y, w, h))
 
     # If signature_template is provided, filter out signature by proportion and template matching
@@ -119,12 +122,12 @@ def crop_and_save(unit_row, signature_template=None):
         out_path = out_dir / f"{Path(sprite_path).stem}_frame_{i}.png"
         cv2.imwrite(str(out_path), patch)
         # Determine frame_type
-        if (abs(w - 58) <= 1 and abs(h - 64) <= 1) or (w == 32 and h == 32):
+        if abs(w - 58) <= 1 and abs(h - 64) <= 1:
             # 58x64px is most likely a unit avatar
             frame_type = 'unit_avatar'
         else:
-            # Other frames are considered unit frames
-            frame_type = 'unit'
+            # Other frames are considered as noice
+            frame_type = 'noice'
         saved_paths.append({
             'Unit_name': unit_name,
             'Frame_ID': int(i),

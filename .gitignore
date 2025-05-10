@@ -1,3 +1,5 @@
-output_patches
+output_patches/
+output_patches_noice/
+dataset/
 .venv
 .DS_Store

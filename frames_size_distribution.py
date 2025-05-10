@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 
 # Constants
 ANNOTATIONS_FILE = './output_patches/annotations_extended.csv'
+# ANNOTATIONS_FILE = './output_patches_noice/annotations_noice_extended.csv'
 
 def analyze_frame_sizes():
     # Load the annotations CSV file
