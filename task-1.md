@@ -101,6 +101,11 @@ annotations/
   val.csv
   test.csv
 
-  ### Make dataset
+### Visualize the annotations
+
+A script to highlight bounding boxes from the csv on a random png sprite.
+
+### Make dataset
 
   Generate a script to make a dataset in `./dataset` folder. Make sure that units with frame_type="unit_avatar" stays in training model. make 15% for testing and 15% for training sets. Pick the units randomly.
+

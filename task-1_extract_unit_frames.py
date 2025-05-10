@@ -12,6 +12,10 @@ CSV_FILE = '../datasets/H3Units.csv'
 OUTPUT_DIR = './output_patches'
 OUTPUT_CSV_FILE = f"{OUTPUT_DIR}/annotations_extended.csv"
 
+# Define sizes Frames to skip skip (e.g., unit avatars)
+unit_avatar_sizes = [(58, 64)]
+# unit_avatar_sizes = [(58, 64), (32, 32), (28, 32), (30, 32), (32, 31)]
+
 # Utility: Normalize name
 def camel_to_hyphen(name):
     return re.sub(r'(?<!^)(?=[A-Z])', '-', name).title()
@@ -40,9 +44,9 @@ def filter_by_histogram_similarity(image, boxes, threshold=0.5):
     filtered_boxes = []
     for i, hist in enumerate(histograms):
         w, h = boxes[i][2], boxes[i][3]
-        # skip for frames [58x64px, 32x32px] as these are most likely be a unit avatar
-        # check the exact size +- 1 px
-        if (abs(58-w) <= 1 and abs(64-h) <= 1) or (w == 32 and h == 32):
+        
+        # Skip frames matching the defined sizes Frames to skip
+        if any(w == sw and h == sh for sw, sh in unit_avatar_sizes):
             # print(f"Keeping patch {i} with ratio: w:{w} h:{h}")
             filtered_boxes.append(boxes[i])
             continue
@@ -118,8 +122,8 @@ def crop_and_save(unit_row, signature_template=None):
         out_dir.mkdir(parents=True, exist_ok=True)
         out_path = out_dir / f"{Path(sprite_path).stem}_frame_{i}.png"
         cv2.imwrite(str(out_path), patch)
-        # Determine frame_type
-        if (abs(w - 58) <= 1 and abs(h - 64) <= 1) or (w == 32 and h == 32):
+        
+        if any(w == sw and h == sh for sw, sh in unit_avatar_sizes):
             # 58x64px is most likely a unit avatar
             frame_type = 'unit_avatar'
         else:
