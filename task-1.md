@@ -52,3 +52,55 @@ Therefore, perform multi-scale template matching
 
 In order to get rid of additional objects like arrows, fireballs etc.:
 - Filtering by color histogram similarity
+
+
+## Generate a dataset
+
+Prepare the dataset for training a neiural network. 
+
+### Improve CSV
+
+Possible Annotation Improvements:
+- Frame Type: Add a column for frame type (fight, map, info, signature, etc.).
+- Bounding Box: If you plan to do detection, keep bounding box coordinates.
+- Augmentation Info: Optionally, keep track of any augmentations applied.
+- Quality/Noise: Optionally, flag noisy or low-quality frames for exclusion.
+
+#### New annotations
+- frame_type
+- boinding_box
+
+### Structure
+
+Split Your Dataset:
+    Training set: ~70-80% of your data
+    Validation set: ~10-15% (for tuning hyperparameters)
+    Test set: ~10-15% (for final evaluation)
+
+A common structure for image datasets is:
+dataset/
+  train/
+    UnitA/
+      frame_0.png
+      frame_1.png
+      ...
+    UnitB/
+      ...
+  val/
+    UnitA/
+      ...
+    UnitB/
+      ...
+  test/
+    UnitA/
+      ...
+    UnitB/
+      ...
+annotations/
+  train.csv
+  val.csv
+  test.csv
+
+  ### Make dataset
+
+  Generate a script to make a dataset in `./dataset` folder. Make sure that units with frame_type="unit_avatar" stays in training model. make 15% for testing and 15% for training sets. Pick the units randomly.

@@ -36,3 +36,13 @@ Handle the alpha channel in PNG files, which might represent the background.
 Prepare dataset. match images with csv annotations, extend the annotation with additional data, like filepath, etc. Keep the original annotations.
 If the image has an alpha channel, we can use it to create a mask for detecting valid bounding boxes.
 Remove unwanted information from the dataset. As an implementation option - detect all objects and filter out unwanted objects by bounding boxes size. 
+
+
+
+
+## Task 2
+Makeup the dataset.
+Prepare the dataset for training a neiural network. 
+
+### 
+geterate a script to make a dataset in the `dataset` folder. 
