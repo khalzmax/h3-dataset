@@ -3,6 +3,6 @@ output_patches_noice/
 dataset/
 visualization_output/
 prompt.md
-signature_template.png
+signature_avatar.png
 .venv
 .DS_Store
