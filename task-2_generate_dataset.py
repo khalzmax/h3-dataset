@@ -73,36 +73,30 @@ def create_dataset():
     # Separate avatar frames (these all go to training set)
     avatar_df = df[df['frame_type'] == 'unit_avatar'].copy()
     regular_df = df[df['frame_type'] != 'unit_avatar'].copy()
-    
+
     print(f"Found {len(avatar_df)} avatar frames - all will go to training set")
     print(f"Found {len(regular_df)} regular unit frames - these will be split")
-    
-    # Get unique units for splitting
-    unique_units = regular_df['Unit_name'].unique()
-    np.random.seed(RANDOM_SEED)
-    np.random.shuffle(unique_units)
-    
-    # Calculate split counts
-    total_units = len(unique_units)
-    val_count = int(total_units * VAL_RATIO)
-    test_count = int(total_units * TEST_RATIO)
-    train_count = total_units - val_count - test_count
-    
-    # Split units by name
-    train_units = unique_units[:train_count]
-    val_units = unique_units[train_count:train_count+val_count]
-    test_units = unique_units[train_count+val_count:]
-    
-    print(f"Split units: {train_count} training, {val_count} validation, {test_count} testing")
-    
-    # Create split dataframes based on unit name
-    train_df = pd.concat([
-        avatar_df,
-        regular_df[regular_df['Unit_name'].isin(train_units)]
-    ])
-    val_df = regular_df[regular_df['Unit_name'].isin(val_units)]
-    test_df = regular_df[regular_df['Unit_name'].isin(test_units)]
-    
+
+    # Stratified split for regular frames
+    reg_train, reg_temp = train_test_split(
+        regular_df,
+        test_size=VAL_RATIO + TEST_RATIO,
+        random_state=RANDOM_SEED,
+        stratify=regular_df['Unit_name']
+    )
+    relative_val_ratio = VAL_RATIO / (VAL_RATIO + TEST_RATIO)
+    reg_val, reg_test = train_test_split(
+        reg_temp,
+        test_size=1 - relative_val_ratio,
+        random_state=RANDOM_SEED,
+        stratify=reg_temp['Unit_name']
+    )
+
+    # Combine avatar frames with regular train split
+    train_df = pd.concat([avatar_df, reg_train])
+    val_df = reg_val
+    test_df = reg_test
+
     print(f"Final split: {len(train_df)} training, {len(val_df)} validation, {len(test_df)} testing")
     
     # Function to copy files and update paths

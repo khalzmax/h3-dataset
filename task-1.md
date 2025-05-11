@@ -3,7 +3,8 @@
 After running AI-generated object recognition without filtering frame sizes,
 the dataset has lots of small frames, with the max size 7x10 px. We need to filter out these objects from the dataset
 
-### Frame Size Distribution:
+```
+## Frame Size Distribution:
               Width        Height
 count  80672.000000  80672.000000
 mean      11.893073     13.409510
@@ -13,8 +14,10 @@ min        1.000000      1.000000
 50%        2.000000      1.000000
 75%        6.000000      7.000000
 max     1133.000000   1011.000000
+```
 
-### Values with high frequency (Width):
+```
+## Values with high frequency (Width):
 Width
 1    39186
 2     9421
@@ -24,8 +27,10 @@ Width
 4     2494
 7     2469
 Name: count, dtype: int64
+```
 
-### Values with high frequency (Height):
+```
+## Values with high frequency (Height):
 Height
 1     40899
 2      8418
@@ -35,7 +40,7 @@ Height
 3      2806
 4      1257
 Name: count, dtype: int64
-
+```
 
 ## 
 Some frames are just additional objects, like a 
@@ -109,6 +114,55 @@ A script to highlight bounding boxes from the csv on a random png sprite.
 
   Generate a script to make a dataset in `./dataset` folder. Make sure that units with frame_type="unit_avatar" stays in training model. make 15% for testing and 15% for training sets. Pick the units randomly.
 
+# Task 3 Inspect dataset TODO
+# Task 4 (3.1) Train neural network
 
-# Task 3. Train neural network
+
+based on the size describution, perform resize to all images to mean values 74x86
+
+```
+Frame Size Distribution:
+             Width       Height
+count  9821.000000  9821.000000
+mean     73.979635    85.744934
+std      34.855930    24.469462
+min      26.000000    26.000000
+25%      47.000000    72.000000
+50%      65.000000    88.000000
+75%      93.000000   102.000000
+max     271.000000   210.000000
+```
+
+### run 1
+```
+IMG_WIDTH, IMG_HEIGHT = 74, 86
+BATCH_SIZE = 32
+EPOCHS = 25
+```
+
+```
+Training time: 1091.34 seconds
+Train Acc      0.8721098303794861
+Validation Acc 0.04444444552063942
+
+Evaluating on test set...
+Test loss: 34.3056
+Test accuracy: 0.0042
+```
+`training_history_1.png`
+
+#### Warning
+```
+UserWarning: Your input ran out of data; interrupting training. Make sure that your dataset or generator can generate at least `steps_per_epoch * epochs` batches. You may need to use the `.repeat()` function when building your dataset.
+```
+
+<!-- I guess I need to decrease the batch size -->
+I see that the unit distribution is not ballanced across the train, val and test sets. Need to fix the generation script to ensure units distributions across sets
+### run 2
+
+Run with the same parameters after optimizing the dataset.
+
+
+
+# Task 5. Test on Video
 

@@ -4,5 +4,6 @@ dataset/
 visualization_output/
 prompt.md
 signature_avatar.png
+*.png
 .venv
 .DS_Store
