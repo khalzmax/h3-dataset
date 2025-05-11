@@ -1,9 +1,10 @@
 output_patches/
 output_patches_noice/
 dataset/
-visualization_output/
+visualization_output/units/
 gameplay/
 prompt.md
+task-1.md
 signature_avatar.png
 *.png
 .venv
