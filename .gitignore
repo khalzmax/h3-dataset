@@ -2,6 +2,7 @@ output_patches/
 output_patches_noice/
 dataset/
 visualization_output/
+gameplay/
 prompt.md
 signature_avatar.png
 *.png
