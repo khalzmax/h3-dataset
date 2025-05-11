@@ -158,11 +158,84 @@ UserWarning: Your input ran out of data; interrupting training. Make sure that y
 
 <!-- I guess I need to decrease the batch size -->
 I see that the unit distribution is not ballanced across the train, val and test sets. Need to fix the generation script to ensure units distributions across sets
+
 ### run 2
 
 Run with the same parameters after optimizing the dataset.
+```
+Training time: 295.60 seconds
+Train Acc      0.7574755549430847
+Validation Acc 0.8426966071128845
 
+Test loss: 2.1866
+Test accuracy: 0.8491
+```
+This is much better! 
 
+Seems like we can contunie learning the dataset. Next time let's double number of epochs.
+Also, let's add a Dropout before the last Dense.
+
+The peak on the loss chart for 6 and 7 epochs seems to be related not enough data in datasets (remember warnings).
+Now let's try to fix the warning by reducing the batch size. Not sure if number of epochs also affects to this warning.. let's see
+
+# run 3
+
+```
+BATCH_SIZE = 8
+EPOCHS = 50
+Model: added Dropout before the last Dense
+```
+
+```
+Training time: 1168.33 seconds
+Train Acc      0.75
+Validation Acc 0.9073033928871155
+
+Test loss: 1.1798
+Test accuracy: 0.9214
+```
+Epoch 2 - running out of data warning 
+
+The training accuracy has periodically drops, but overall the total test accuracy is 93%
+
+# run 4
+
+For the next run, let's try to increase the batch size, and decrease number of epics. With the bigger butch size I expect the net will be training quicker.
+
+```
+BATCH_SIZE = 32
+EPOCHS = 25 
+```
+```
+Training time: 182.83 seconds
+Train Acc      0.7268011569976807
+Validation Acc 0.9197443127632141
+
+Test loss: 1.3422
+Test accuracy: 0.9158
+```
+
+# run 5
+
+Reducing batch_size to 24
+Increasing training image size to 80, 96
+- epochs 50
+- reduced number of convolution levels
+- removed dropout
+
+```
+Training time: 286.02 seconds
+Train Acc      1.0
+Validation Acc 0.9201977252960205
+
+Test loss: 1.0539
+Test accuracy: 0.9256
+```
+
+By reducing the number of convolution layers and removed dropouts we got the highers accuracy so far 92,6%
+
+![Training History Run 5](./training_history_5)
 
 # Task 5. Test on Video
+
 

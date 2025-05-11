@@ -18,10 +18,10 @@ TEST_CSV = os.path.join(ANNOTATIONS_DIR, 'test.csv')
 MODEL_PATH = './unit_classifier_model.keras'
 
 # Image dimensions - updated to better match the mean frame dimensions
-# IMG_WIDTH, IMG_HEIGHT = 80, 96  # Rounded up from mean of 74x86
-IMG_WIDTH, IMG_HEIGHT = 74, 86  # Rounded up from mean of 74x86
-BATCH_SIZE = 16
-EPOCHS = 25  # Increased for more training time with early stopping
+IMG_WIDTH, IMG_HEIGHT = 80, 96  # Rounded up from mean of 74x86
+# IMG_WIDTH, IMG_HEIGHT = 74, 86  # Rounded up from mean of 74x86
+BATCH_SIZE = 24
+EPOCHS = 50  # Increased for more training time with early stopping
 
 # Set seeds for reproducibility
 from numpy.random import seed
@@ -61,20 +61,20 @@ def build_model(input_shape, num_classes):
     model = Sequential([
         # First conv block
         Conv2D(32, kernel_size=(3, 3), padding='same', activation="relu", input_shape=input_shape),
-        Conv2D(32, kernel_size=(3, 3), padding='same', activation="relu"),
-        BatchNormalization(),
+        # Conv2D(32, kernel_size=(3, 3), padding='same', activation="relu"),
+        # BatchNormalization(),
         MaxPooling2D(pool_size=(2, 2)),
         
         # Second conv block
         Conv2D(64, kernel_size=(3, 3), padding='same', activation="relu"),
-        Conv2D(64, kernel_size=(3, 3), padding='same', activation="relu"),
-        BatchNormalization(),
+        # Conv2D(64, kernel_size=(3, 3), padding='same', activation="relu"),
+        # BatchNormalization(),
         MaxPooling2D(pool_size=(2, 2)),
         
         # Third conv block
         Conv2D(128, kernel_size=(3, 3), padding='same', activation="relu"),
-        Conv2D(128, kernel_size=(3, 3), padding='same', activation="relu"),
-        BatchNormalization(),
+        # Conv2D(128, kernel_size=(3, 3), padding='same', activation="relu"),
+        # BatchNormalization(),
         MaxPooling2D(pool_size=(2, 2)),
         
         # Fully connected layers

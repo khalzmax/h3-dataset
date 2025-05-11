@@ -12,7 +12,7 @@ import tqdm as tqdm
 # Configuration
 ANNOTATIONS_CSV = './output_patches/annotations_extended.csv'
 SPRITES_DIR = '../datasets/heroes3_sprites/units'
-OUTPUT_DIR = './visualization_output'
+OUTPUT_DIR = './visualization_output/units'
 
 # Utility: Normalize name (same as in your existing code)
 def camel_to_hyphen(name):
