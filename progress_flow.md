@@ -64,6 +64,10 @@ Therefore, perform multi-scale template matching.
 In order to get rid of additional objects like arrows, fireballs etc.:
 - Filtering by color histogram similarity
 
+### Author sign frame
+
+Each PNG file has the author sign with avatar. The data extract script allows to provide the `signature_avatar.png` file with the template that needs to be excluded from the dataset.
+
 ### Small avatar problem
 
 There are normal avatars and small avatars on each frame-set. The normal avatar has is constant 58x64px and has some colored background.
@@ -126,6 +130,10 @@ So far I managed to get the best results from the automatic dataset generation. 
 
 Also I would think about better ways to recognize the unit avatars.
 
+In general, the dataset seem to lack enough frames. We will see the Tensorflow warns us about this. I should probably look for more data augmentation options.
+
+The dataset does not have frames with different background, which might be a problem on production environment where all the units have a background. For further improvements, the dataset need to be extended with unit frames from the game.
+
 ---
 
 ## Task 2. Generate the dataset
@@ -177,6 +185,10 @@ A script to highlight bounding boxes from the csv on a random png sprite.
 **Python file:**  
 - `task-4_train_network.py`  
   Defines and trains a convolutional neural network using TensorFlow/Keras. Uses the generated dataset for training and validation. Saves the trained model for later inference.
+
+### Data augmentation
+
+For the data augmentation I used the `horizontal_flip` for all runs. However, I would like to also play with the `zoom_range` and other augmentation methods.
 
 ### run 1
 
