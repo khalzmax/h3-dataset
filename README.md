@@ -58,13 +58,6 @@ For a detailed overview of the dataset, including its structure, class distribut
 
 ---
 
-## Acknowledgements
-
-- Sprites: [The Spriters Resource](https://www.spriters-resource.com/pc_computer/heroes3/)
-- Annotations: [Kaggle Dataset by Dayne Arthur](https://www.kaggle.com/datasets/daynearthur/heroes-of-might-and-magic-3-units/data)
-
----
-
 ## Note on AI Assistance
 
 This project was developed with help from GitHub Copilot, an AI coding assistant. Due to my limited experience with Python, Copilot played a crucial role in helping me write efficient code, troubleshoot issues, and complete the project on time.
