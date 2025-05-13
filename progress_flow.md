@@ -4,6 +4,33 @@ This document outlines my step-by-step progress, decisions, and key results thro
 
 ---
 
+## Task 0: Seek Data and Analyze
+
+I found the following data that can be used for the dataset:
+
+- **Sprites:** ["Heroes of Might and Magic 3" Sprites](https://www.spriters-resource.com/pc_computer/heroes3/)
+- **Annotations:** ["Heroes of Might and Magic 3 Units" Kaggle Dataset](https://www.kaggle.com/datasets/daynearthur/heroes-of-might-and-magic-3-units/data)
+
+### Annotations
+
+There are two CVS datasets available on kaggle for Heroes of Might and Magic 3:
+- Heroes of Might and Magic 3 Units
+https://www.kaggle.com/datasets/daynearthur/heroes-of-might-and-magic-3-units/data
+- Maps for Heroes of Might and Magic
+ https://www.kaggle.com/datasets/pyatakov/maps-for-heroes-of-might-and-magic
+
+We will work with the Heroes of Might and Magic 3 Units.
+
+### Sprites
+For downloading sprites, I found a really handy tool on GitHub: [spriters-resource](https://github.com/andrienko/spriters-resource).  
+This script automates the process of downloading sprites from the spriters-resource.com website.
+
+We will focus on the `units` from the downloaded data. However, there are many additional resources available that will be really handy for further development.
+
+### Matching Annotations with Frames
+
+The idea is to align the annotations from the CSV file with the corresponding frames in the `units` folder. We will use the `Unit_Name` field from the CSV and match it with the file names in the folder. 
+
 ## Task 1. Dataset Preparation
 
 After running object recognition without filtering frame sizes, the dataset contained many small frames, with a maximum size of 7x10 px. These objects needed to be filtered out from the dataset.
