@@ -74,6 +74,14 @@ The small avatar bounding box size differs - approximately 30x30px, +/- 2-5px. H
 The small avatar is usually a smaller copy of a normal avatar, but with a transparent background.
 I used this information to match the avatars in the `task-1_extract_unit_frames.py` script.
 
+As shown in the Monk PNG, both avatars were successfully detected, even when flipped horizontally.
+
+However, this approach does not work perfectly, as some small avatars are even smaller, around 20x20 px. Including all of these sizes would introduce too much noise. If I can address the issue with the low efficiency of the mean histogram filter (which seems to be the case), reducing the size filter might allow more small avatars to be included in the dataset.
+
+#### Visualize frames with annotations
+
+![Monk Boxes](./visualization_output/Monk_boxes.png)
+
 **Python file:**
 - [`task-1_extract_unit_frames.py`](./task-1_extract_unit_frames.py)
     Extracts unit frames from raw sprite sheets. Implements multi-scale template matching and color histogram similarity to identify and separate unit avatars and small objects. Saves extracted frames with annotations for further processing.
