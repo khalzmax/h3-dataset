@@ -133,7 +133,7 @@ annotations/
 
 ### Data quality recap
 
-So far, I managed to get the best results from the automatic dataset generation. For future improvement of the dataset, I would think about better ways to recognize the additional items (they usually come in a row, have different mean histograms, and are of similar sizes).
+So far, I managed to get the best results from the automatic dataset generation. For future improvement of the dataset, I would think about better ways to recognize the additional items (they usually come in a row, have same mean histograms, and are of similar sizes).
 
 Also, I would think about better ways to recognize the unit avatars.
 
